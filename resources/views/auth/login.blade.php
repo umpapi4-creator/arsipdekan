@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <form method="POST" action="{{ route('login.store') }}" class="login-form">
+        <form method="POST" action="/login" class="login-form">
             @csrf
             <div class="field">
                 <label for="username">Username</label>

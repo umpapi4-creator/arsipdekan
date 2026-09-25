@@ -37,6 +37,7 @@ foreach ([
 
 $runtimeDefaults = [
     'SESSION_DRIVER' => 'cookie',
+    'SESSION_SECURE_COOKIE' => 'true',
     'CACHE_DRIVER' => 'array',
     'LOG_CHANNEL' => 'stderr',
     'VIEW_COMPILED_PATH' => $storagePath.'/framework/views',
@@ -57,6 +58,15 @@ $app->useBootstrapPath($bootstrapPath);
 $app->useStoragePath($storagePath);
 
 $kernel = $app->make(Kernel::class);
+
+// Vercel terminates HTTPS at its proxy. Make the captured request reflect
+// the public HTTPS request even before Laravel evaluates URL/cookie state.
+if (getenv('VERCEL')) {
+    $_SERVER['HTTPS'] = 'on';
+    $_SERVER['SERVER_PORT'] = '443';
+    $_SERVER['HTTP_X_FORWARDED_PROTO'] = 'https';
+}
+
 $request = Request::capture();
 $response = $kernel->handle($request);
 $response->send();

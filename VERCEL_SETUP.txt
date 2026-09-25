@@ -53,3 +53,9 @@ DEPLOY VIA GITHUB:
 3. Import repository tersebut di Vercel.
 4. Isi Environment Variables seperti di atas.
 5. Redeploy.
+
+
+V4 STATIC-ASSET FIX
+-------------------
+CSS, favicon, PDF-Lib, and archive.js are rendered inline from files already under public/.
+This avoids Vercel PHP static-asset routing/MIME issues while preserving the same CSS/JS source and UI behavior.

@@ -1,0 +1,21 @@
+Vercel 419 / HTTPS fix
+======================
+Perubahan deployment-only:
+- TrustProxies mempercayai proxy Vercel.
+- Production URL dipaksa HTTPS.
+- Form login POST ke path relatif /login.
+- Session default Vercel memakai cookie + Secure.
+- Koneksi pgsql ditambahkan untuk Supabase.
+
+Environment Vercel yang disarankan:
+APP_ENV=production
+APP_URL=https://arsipdekan.vercel.app
+APP_DEBUG=false
+SESSION_DRIVER=cookie
+SESSION_SECURE_COOKIE=true
+DB_CONNECTION=pgsql
+DB_PORT=5432
+DB_DATABASE=postgres
+
+DB_HOST, DB_USERNAME, DB_PASSWORD mengikuti Session Pooler Supabase.
+Jangan mengganti APP_KEY yang sudah dipakai aplikasi.
