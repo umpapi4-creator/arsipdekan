@@ -1,0 +1,55 @@
+SISTEM ARSIP PRODI - SETUP VERCEL
+================================
+
+Project ini sudah ditambahkan konfigurasi Vercel tanpa mengubah controller,
+route, tampilan Blade, CSS, JavaScript, maupun logika aplikasi.
+
+FILE YANG DITAMBAHKAN KHUSUS DEPLOYMENT:
+- api/index.php
+- vercel.json
+- .vercelignore
+
+PENTING: .env TIDAK BOLEH DI-UPLOAD KE GITHUB.
+Masukkan nilai .env melalui Vercel > Project > Settings > Environment Variables.
+
+MINIMAL ENVIRONMENT VARIABLES YANG DIPERLUKAN:
+APP_NAME=Sistem Arsip Prodi
+APP_ENV=production
+APP_KEY=<salin APP_KEY dari .env lokal>
+APP_DEBUG=false
+APP_URL=https://DOMAIN-VERCEL-ANDA.vercel.app
+LOG_CHANNEL=stderr
+CACHE_DRIVER=array
+SESSION_DRIVER=cookie
+
+DATABASE:
+DB_CONNECTION=mysql
+DB_HOST=<host database online, BUKAN 127.0.0.1/localhost>
+DB_PORT=3306
+DB_DATABASE=<nama database>
+DB_USERNAME=<username database>
+DB_PASSWORD=<password database>
+
+GOOGLE DRIVE:
+GOOGLE_DRIVE_CLIENT_ID=<client id>
+GOOGLE_DRIVE_CLIENT_SECRET=<client secret>
+GOOGLE_DRIVE_REDIRECT_URI=https://DOMAIN-VERCEL-ANDA.vercel.app/google/callback
+
+Masukkan juga SEED_*_PASSWORD dan variabel lain yang memang digunakan dari .env lokal.
+
+CATATAN VERCEL:
+1. Database Laragon/local laptop tidak dapat diakses dari Vercel. Gunakan database online.
+2. File system Vercel bersifat read-only kecuali /tmp. Konfigurasi deployment ini
+   mengarahkan file runtime Laravel (view/cache/log) ke /tmp.
+3. Lampiran foto penomoran saat ini memakai disk lokal Laravel. Penyimpanan lokal
+   serverless tidak permanen, jadi untuk penggunaan produksi lampiran tersebut perlu
+   storage persisten bila ingin tetap tersimpan setelah instance berubah.
+4. Batas payload Vercel Function dapat membatasi unggahan file besar walaupun
+   validasi aplikasi lokal mengizinkan ukuran lebih besar.
+
+DEPLOY VIA GITHUB:
+1. Extract project ini.
+2. Push isi project ke branch main GitHub.
+3. Import repository tersebut di Vercel.
+4. Isi Environment Variables seperti di atas.
+5. Redeploy.
