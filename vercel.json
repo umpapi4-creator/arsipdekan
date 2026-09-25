@@ -1,15 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
-    "api/index.php": {
+    "api/*.php": {
       "runtime": "vercel-php@0.5.5"
     }
   },
   "routes": [
-    { "src": "/favicon.svg", "dest": "/public/favicon.svg" },
-    { "src": "/css/(.*)", "dest": "/public/css/$1" },
-    { "src": "/js/(.*)", "dest": "/public/js/$1" },
-    { "src": "/vendor/(.*)", "dest": "/public/vendor/$1" },
+    { "src": "/favicon\\.svg$", "dest": "/api/assets.php?path=favicon.svg" },
+    { "src": "/favicon\\.ico$", "dest": "/api/assets.php?path=favicon.ico" },
+    { "src": "/robots\\.txt$", "dest": "/api/assets.php?path=robots.txt" },
+    { "src": "/(css|js|vendor|images|img|fonts|assets|build)/(.*)$", "dest": "/api/assets.php?path=$1/$2" },
     { "src": "/(.*)", "dest": "/api/index.php" }
   ]
 }
