@@ -42,15 +42,27 @@
 
     if (fileInput) {
         fileInput.addEventListener('change', function () {
-            const file = fileInput.files && fileInput.files[0];
-            if (!file) return;
-            if (file.size > 100 * 1024 * 1024) {
-                showToast('Ukuran file maksimal 100 MB.', true);
-                fileInput.value = '';
+            const files = Array.from(fileInput.files || []);
+            if (!files.length) {
+                fileName.textContent = 'Pilih atau tarik beberapa file';
+                fileMeta.textContent = 'Bisa pilih banyak file sekaligus • maksimal 100 MB/file';
                 return;
             }
-            fileName.textContent = file.name;
-            fileMeta.textContent = readableBytes(file.size) + ' • siap diunggah';
+
+            const oversized = files.find(function (file) {
+                return file.size > 100 * 1024 * 1024;
+            });
+            if (oversized) {
+                showToast(oversized.name + ' melebihi batas 100 MB.', true);
+                fileInput.value = '';
+                fileName.textContent = 'Pilih atau tarik beberapa file';
+                fileMeta.textContent = 'Bisa pilih banyak file sekaligus • maksimal 100 MB/file';
+                return;
+            }
+
+            const totalSize = files.reduce(function (total, file) { return total + file.size; }, 0);
+            fileName.textContent = files.length === 1 ? files[0].name : files.length + ' file dipilih';
+            fileMeta.textContent = readableBytes(totalSize) + ' total • siap diunggah';
         });
     }
 
@@ -70,19 +82,89 @@
         dropzone.addEventListener('drop', function (event) {
             if (!fileInput || !event.dataTransfer.files.length) return;
             const transfer = new DataTransfer();
-            transfer.items.add(event.dataTransfer.files[0]);
+            Array.from(event.dataTransfer.files).forEach(function (file) {
+                transfer.items.add(file);
+            });
             fileInput.files = transfer.files;
             fileInput.dispatchEvent(new Event('change'));
         });
     }
 
     if (uploadForm) {
-        uploadForm.addEventListener('submit', function () {
-            const submit = uploadForm.querySelector('.upload-submit');
-            if (submit) {
-                submit.disabled = true;
-                submit.textContent = 'Sedang mengunggah...';
+        uploadForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const files = Array.from((fileInput && fileInput.files) || []);
+            if (!files.length) {
+                showToast('Pilih minimal satu file.', true);
+                return;
             }
+
+            const oversized = files.find(function (file) {
+                return file.size > 100 * 1024 * 1024;
+            });
+            if (oversized) {
+                showToast(oversized.name + ' melebihi batas 100 MB.', true);
+                return;
+            }
+
+            const submit = uploadForm.querySelector('.upload-submit');
+            const prodiSelect = document.getElementById('uploadProdi');
+            const hiddenProdi = uploadForm.querySelector('input[name="prodi_key"]');
+            const prodiKey = prodiSelect ? prodiSelect.value : (hiddenProdi ? hiddenProdi.value : (config.prodiKey || ''));
+            const failures = [];
+            let successCount = 0;
+
+            if (submit) submit.disabled = true;
+            if (fileInput) fileInput.disabled = true;
+
+            for (let index = 0; index < files.length; index += 1) {
+                const file = files[index];
+                if (submit) submit.textContent = 'Mengunggah ' + (index + 1) + '/' + files.length + '...';
+                fileName.textContent = files.length === 1 ? file.name : 'Mengunggah ' + (index + 1) + ' dari ' + files.length + ' file';
+                fileMeta.textContent = file.name + ' • ' + readableBytes(file.size);
+
+                try {
+                    const form = new FormData();
+                    form.append('file', file);
+                    form.append('prodi_key', prodiKey);
+
+                    const response = await fetch(config.uploadUrl || uploadForm.action, {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': config.csrf
+                        },
+                        body: form
+                    });
+                    const result = await response.json().catch(function () { return {}; });
+                    if (!response.ok) {
+                        const validation = result.errors ? Object.values(result.errors).flat()[0] : null;
+                        throw new Error(validation || result.message || 'Gagal diunggah.');
+                    }
+                    successCount += 1;
+                } catch (error) {
+                    failures.push(file.name + ': ' + (error.message || 'gagal diunggah'));
+                }
+            }
+
+            if (failures.length) {
+                showToast(successCount + ' file berhasil, ' + failures.length + ' file gagal. ' + failures[0], true);
+            } else {
+                showToast(successCount + ' file berhasil disimpan ke Google Drive.');
+            }
+
+            if (successCount > 0) {
+                window.setTimeout(function () { window.location.reload(); }, 900);
+                return;
+            }
+
+            if (submit) {
+                submit.disabled = false;
+                submit.textContent = 'Unggah ke Google Drive';
+            }
+            if (fileInput) fileInput.disabled = false;
         });
     }
 

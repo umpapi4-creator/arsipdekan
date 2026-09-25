@@ -149,10 +149,10 @@
                     <button id="openScanner" class="btn btn-scanner btn-block" type="button" @disabled(!$connected)><svg viewBox="0 0 24 24"><path d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3M8 8h8v8H8z"/></svg> Pindai dokumen dengan kamera</button>
 
                     <label class="dropzone {{ !$connected ? 'disabled' : '' }}" id="dropzone">
-                        <input id="fileInput" type="file" name="file" @disabled(!$connected) required>
+                        <input id="fileInput" type="file" name="file" multiple @disabled(!$connected) required>
                         <span class="drop-icon"><svg viewBox="0 0 24 24"><path d="M17 19H7a5 5 0 1 1 .7-9.9A7 7 0 0 1 21 12a4 4 0 0 1-4 7Z"/><path d="m9 13 3-3 3 3M12 10v7"/></svg></span>
-                        <strong id="fileName">Pilih atau tarik file</strong>
-                        <small id="fileMeta">PDF, Word, Excel, gambar, ZIP • maksimal 100 MB</small>
+                        <strong id="fileName">Pilih atau tarik beberapa file</strong>
+                        <small id="fileMeta">Bisa pilih banyak file sekaligus • maksimal 100 MB/file</small>
                     </label>
                     <button class="btn btn-primary btn-block upload-submit" type="submit" @disabled(!$connected)>Unggah ke Google Drive</button>
                 </form>
