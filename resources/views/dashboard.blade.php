@@ -198,7 +198,7 @@
 @endsection
 
 @push('scripts')
-<script src="{{ asset('vendor/pdf-lib.min.js') }}"></script>
+<script>{!! file_get_contents(public_path('vendor/pdf-lib.min.js')) !!}</script>
 <script>
     window.ARSIP_CONFIG = {{ Illuminate\Support\Js::from([
         'uploadUrl' => route('archive.upload'),
@@ -207,5 +207,5 @@
         'prodiKey' => $user->prodi_key,
     ]) }};
 </script>
-<script src="{{ asset('js/archive.js') }}"></script>
+<script>{!! file_get_contents(public_path('js/archive.js')) !!}</script>
 @endpush
