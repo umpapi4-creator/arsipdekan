@@ -15,8 +15,11 @@ define('LARAVEL_START', microtime(true));
  | application's routes, controllers, views, or business logic.
  */
 $storagePath = '/tmp/laravel-storage';
+$bootstrapPath = '/tmp/laravel-bootstrap';
 
 foreach ([
+    $bootstrapPath,
+    $bootstrapPath.'/cache',
     $storagePath,
     $storagePath.'/app',
     $storagePath.'/app/public',
@@ -50,6 +53,7 @@ foreach ($runtimeDefaults as $key => $value) {
 require __DIR__.'/../vendor/autoload.php';
 
 $app = require_once __DIR__.'/../bootstrap/app.php';
+$app->useBootstrapPath($bootstrapPath);
 $app->useStoragePath($storagePath);
 
 $kernel = $app->make(Kernel::class);
